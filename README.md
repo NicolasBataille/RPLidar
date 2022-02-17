@@ -219,9 +219,10 @@ For example:
     float angle_in_degrees = node.angle_z_q14 * 90.f / (1 << 14);
     float distance_in_meters = node.dist_mm_q2 / 1000.f / (1 << 2);
 
-Contact Slamtec
----------------
 
-If you have any extra questions, please feel free to contact us at our support email:
 
-    support AT slamtec DOT com
+Note for usage :
+-------------------------------------------
+
+- To change the interface used by the lidar, change the value in the main file.
+- The lidar gives an approximate number of values depending of its disposition and
