@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include "rplidar.h" //RPLIDAR standard sdk, all-in-one header
 
@@ -182,17 +183,101 @@ int main(int argc, const char * argv[]) {
         rplidar_response_measurement_node_t nodes[8192];
         size_t   count = _countof(nodes);
 
+        // std::cout << nodes[90].distance_q2/4.0f << std::endl;
+        int cpt = 0; //on créé un compteur pour voir combien d'éléments sont donnés par le Lidar
+
         op_result = drv->grabScanData(nodes, count);
 
         if (IS_OK(op_result)) {
             drv->ascendScanData(nodes, count);
             for (int pos = 0; pos < (int)count ; ++pos) {
-                printf("%s theta: %03.2f Dist: %08.2f Q: %d \n", 
-                    (nodes[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT) ?"S ":"  ", 
-                    (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
-                    nodes[pos].distance_q2/4.0f,
-                    nodes[pos].sync_quality >> RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
+                // printf("%s theta: %03.2f Dist: %08.2f Q: %d \n", 
+                    // (nodes[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT) ?"S ":"  ", 
+                    // (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
+                    // nodes[pos].distance_q2/4.0f,
+                    // nodes[pos].sync_quality >> RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
+
+                    cpt++;
             }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //  Testing part    ////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            int quart = cpt/4;  //permet d'avoir la sectorisation en quartiers de l'analyde du Lidar
+            int treshold_distance = 300;    //valeurs seuil de distance pour les test (unité à définir)
+
+            bool front, right, back, left = false;  //set les booléennes utilisées pour les messages de test
+
+            //Front part
+            for(int i = 0; i < quart; i++){
+                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                    front = true;
+                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                    break;
+                }
+            }
+
+            //Right part
+            for(int i = quart; i < quart*2; i++){
+                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                    right = true;
+                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                    break;
+                }
+            }
+
+            //Back part
+            for(int i = quart*2; i < quart*3; i++){
+                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                    back = true;
+                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                    break;
+                }
+            }
+
+            //Left part
+            for(int i = quart*3; i < quart*4; i++){
+                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                    left = true;
+                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                    break;
+                }
+            }
+
+            if(front){
+                std::cout << "Un obstacle est devant" << std::endl;
+            }
+            else{
+                std::cout << "Rien devant" << std::endl;
+            }
+
+            if(right){
+                std::cout << "Un obstacle est à droite" << std::endl;
+            }
+            else{
+                std::cout << "Rien à droite" << std::endl;
+            }
+
+            if(back){
+                std::cout << "Un obstacle est derrière" << std::endl;
+            }
+            else{
+                std::cout << "Rien derrière" << std::endl;
+            }
+
+            if(left){
+                std::cout << "Un obstacle est à gauche" << std::endl;
+            }
+            else{
+                std::cout << "Rien à gauche" << std::endl;
+            }
+
+            front, right, back, left = false;   //reset des booléennes
+
+            cpt = 0;    //remet le compteur à 0 pour la prochaine analyse
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         if (ctrl_c_pressed){ 
