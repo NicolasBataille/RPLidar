@@ -224,4 +224,5 @@ For example:
 Note for usage :
 -------------------------------------------
 
-To change the interface used by the lidar, change the value in the main file.
+- To change the interface used by the lidar, change the value in the main file.
+- The lidar gives an approximate number of values depending of its disposition and
