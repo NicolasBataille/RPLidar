@@ -211,7 +211,7 @@ int main(int argc, const char * argv[]) {
 
             //Front part
             for(int i = 0; i < quart; i++){
-                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
                     front = true;
                     std::cout << nodes[i].distance_q2/4.0f << std::endl;
                     break;
@@ -220,7 +220,7 @@ int main(int argc, const char * argv[]) {
 
             //Right part
             for(int i = quart; i < quart*2; i++){
-                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
                     right = true;
                     std::cout << nodes[i].distance_q2/4.0f << std::endl;
                     break;
@@ -229,7 +229,7 @@ int main(int argc, const char * argv[]) {
 
             //Back part
             for(int i = quart*2; i < quart*3; i++){
-                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
                     back = true;
                     std::cout << nodes[i].distance_q2/4.0f << std::endl;
                     break;
@@ -238,7 +238,7 @@ int main(int argc, const char * argv[]) {
 
             //Left part
             for(int i = quart*3; i < quart*4; i++){
-                if(nodes[i].distance_q2/4.0f <= treshold_distance){
+                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
                     left = true;
                     std::cout << nodes[i].distance_q2/4.0f << std::endl;
                     break;
@@ -247,6 +247,7 @@ int main(int argc, const char * argv[]) {
 
             if(front){
                 std::cout << "Un obstacle est devant" << std::endl;
+                front = false;
             }
             else{
                 std::cout << "Rien devant" << std::endl;
@@ -254,6 +255,7 @@ int main(int argc, const char * argv[]) {
 
             if(right){
                 std::cout << "Un obstacle est à droite" << std::endl;
+                right = false;
             }
             else{
                 std::cout << "Rien à droite" << std::endl;
@@ -261,6 +263,7 @@ int main(int argc, const char * argv[]) {
 
             if(back){
                 std::cout << "Un obstacle est derrière" << std::endl;
+                back = false;
             }
             else{
                 std::cout << "Rien derrière" << std::endl;
@@ -268,13 +271,14 @@ int main(int argc, const char * argv[]) {
 
             if(left){
                 std::cout << "Un obstacle est à gauche" << std::endl;
+                left = false;
             }
             else{
                 std::cout << "Rien à gauche" << std::endl;
             }
 
-            front, right, back, left = false;   //reset des booléennes
-
+/*            front, right, back, left = false;   //reset des booléennes
+*/
             cpt = 0;    //remet le compteur à 0 pour la prochaine analyse
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

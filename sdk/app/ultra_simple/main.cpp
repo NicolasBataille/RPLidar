@@ -216,7 +216,7 @@ int main(int argc, const char * argv[]) {
                 printf("%s theta: %03.2f Dist: %08.2f Q: %d \n", 
                     (nodes[pos].sync_quality & RPLIDAR_RESP_MEASUREMENT_SYNCBIT) ?"S ":"  ", 
                     (nodes[pos].angle_q6_checkbit >> RPLIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f,
-                    nodes[pos].distance_q2/4.0f,
+                    nodes[pos].distance_q2/4.0,
                     nodes[pos].sync_quality >> RPLIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
             }
         }
