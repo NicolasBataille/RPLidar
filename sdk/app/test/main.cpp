@@ -56,6 +56,105 @@ void ctrlc(int)
     ctrl_c_pressed = true;
 }
 
+int treshold_distance = 300; 
+
+void check_obstacle(std::string s, int treshold, int cpt, rplidar_response_measurement_node_t* nodes){
+                std::string present, notpresent="";
+                int lowerbound, upperbound = 0;
+                int section = cpt/8;
+                int decalangle = section/2;
+                bool spotted=false;
+                bool north=false;
+
+                if (s=="N"){
+                    present="Un obstacle est a l'avant";
+                    notpresent="Il n'y a rien devant";
+                    lowerbound=cpt-decalangle;
+                    upperbound=section-decalangle;
+                    north=true;
+
+                }
+                if (s=="E"){
+                    present="Un obstacle est a droite";
+                    notpresent="Il n'y a rien a droite";
+                    lowerbound=section*2-decalangle;
+                    upperbound=section*3-decalangle;
+                }
+                if (s=="S"){
+                    present="Un obstacle est derrière";
+                    notpresent="Il n'y a rien derrière";
+                    lowerbound=section*4-decalangle;
+                    upperbound=section*5-decalangle;
+                }
+                if (s=="O"){
+                    present="Un obstacle est a gauche";
+                    notpresent="Il n'y a rien a gauche";
+                    lowerbound=section*6-decalangle;
+                    upperbound=section*7-decalangle;
+                }
+                if (s=="NE"){
+                    present="Un obstacle est a l'avant droite";
+                    notpresent="Il n'y a rien a l'avant droite";
+                    lowerbound=section-decalangle;
+                    upperbound=section*2-decalangle;
+                }
+                if (s=="SE"){
+                    present="Un obstacle est a l'arrière droite";
+                    notpresent="Il n'y a rien a l'arrière droite";
+                    lowerbound=section*3-decalangle;
+                    upperbound=section*4-decalangle;
+                }
+                if (s=="SO"){
+                    present="Un obstacle est a l'arrière gauche";
+                    notpresent="Il n'y a rien a l'arrière gauche";
+                    lowerbound=section*5-decalangle;
+                    upperbound=section*6-decalangle;
+                }
+                if (s=="NO"){
+                    present="Un obstacle est a l'avant gauche";
+                    notpresent="Il n'y a rien l'avant gauche";
+                    lowerbound=section*7-decalangle;
+                    upperbound=section*8-decalangle;
+                }
+
+                if (north){
+                    north=false;
+                    for(int i = lowerbound; i < cpt-1; i++){
+                        if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
+                            spotted = true;
+                            std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                            break;
+                        }
+                    }
+                    for(int i = 0; i < upperbound; i++){
+                        if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
+                            spotted = true;
+                            std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                            break;
+                        }
+                    }
+                }
+                else {
+                    for(int i = lowerbound; i < upperbound; i++){
+                        if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
+                            spotted = true;
+                            std::cout << nodes[i].distance_q2/4.0f << std::endl;
+                            break;
+                        }
+                    }
+                }
+
+                if(spotted){
+                    spotted = false;
+                    std::cout << present << std::endl;
+                }
+                else{
+                    std::cout << " " << std::endl;
+                }
+                
+            }
+
+
 int main(int argc, const char * argv[]) {
     const char * opt_com_path = NULL;
     _u32         baudrateArray[2] = {115200, 256000};
@@ -204,81 +303,19 @@ int main(int argc, const char * argv[]) {
             //  Testing part    ////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            int quart = cpt/4;  //permet d'avoir la sectorisation en quartiers de l'analyde du Lidar
-            int treshold_distance = 300;    //valeurs seuil de distance pour les test (unité à définir)
 
-            bool front, right, back, left = false;  //set les booléennes utilisées pour les messages de test
+            treshold_distance = 300;    //valeurs seuil de distance pour les test (en mm selon les test)
 
-            //Front part
-            for(int i = 0; i < quart; i++){
-                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
-                    front = true;
-                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
-                    break;
-                }
-            }
+            check_obstacle("N", treshold_distance, cpt, nodes);
+            check_obstacle("E", treshold_distance, cpt, nodes);
+            check_obstacle("S", treshold_distance, cpt, nodes);
+            check_obstacle("O", treshold_distance, cpt, nodes);
+            check_obstacle("NE", treshold_distance, cpt, nodes);
+            check_obstacle("SE", treshold_distance, cpt, nodes);
+            check_obstacle("SO", treshold_distance, cpt, nodes);
+            check_obstacle("NO", treshold_distance, cpt, nodes);
 
-            //Right part
-            for(int i = quart; i < quart*2; i++){
-                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
-                    right = true;
-                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
-                    break;
-                }
-            }
 
-            //Back part
-            for(int i = quart*2; i < quart*3; i++){
-                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
-                    back = true;
-                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
-                    break;
-                }
-            }
-
-            //Left part
-            for(int i = quart*3; i < quart*4; i++){
-                if((nodes[i].distance_q2/4.0f <= treshold_distance) && (nodes[i].distance_q2/4.0f != 0)){
-                    left = true;
-                    std::cout << nodes[i].distance_q2/4.0f << std::endl;
-                    break;
-                }
-            }
-
-            if(front){
-                std::cout << "Un obstacle est devant" << std::endl;
-                front = false;
-            }
-            else{
-                std::cout << "Rien devant" << std::endl;
-            }
-
-            if(right){
-                std::cout << "Un obstacle est à droite" << std::endl;
-                right = false;
-            }
-            else{
-                std::cout << "Rien à droite" << std::endl;
-            }
-
-            if(back){
-                std::cout << "Un obstacle est derrière" << std::endl;
-                back = false;
-            }
-            else{
-                std::cout << "Rien derrière" << std::endl;
-            }
-
-            if(left){
-                std::cout << "Un obstacle est à gauche" << std::endl;
-                left = false;
-            }
-            else{
-                std::cout << "Rien à gauche" << std::endl;
-            }
-
-/*            front, right, back, left = false;   //reset des booléennes
-*/
             cpt = 0;    //remet le compteur à 0 pour la prochaine analyse
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
